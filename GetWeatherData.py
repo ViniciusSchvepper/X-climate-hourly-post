@@ -4,29 +4,24 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
-chrome_options = Options()
-chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--ignore-ssl-errors')
+def get_weather_data() -> str:
+    chrome_options = Options()
+    chrome_options.add_argument('--ignore-certificate-errors')
+    chrome_options.add_argument('--ignore-ssl-errors')
 
-service = ChromeService(executable_path=ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service)
-driver.get("https://www.tempo.com/jaragua-do-sul.htm")
+    service = ChromeService(executable_path = ChromeDriverManager().install())
+    driver = webdriver.Chrome(service = service)
+    driver.get("https://www.tempo.com/jaragua-do-sul.htm")
 
-row = driver.find_element(By.XPATH, "//tr[contains(@class, '')]")
+    row = driver.find_element(By.XPATH, "//tr[contains(@class, '')]")
 
-horario = row.find_element(By.XPATH, ".//span[@class='text-princ']").text
-print("Horário:", horario)
+    day_time = row.find_element(By.XPATH, ".//span[@class='text-princ']").text
+    temp_in_celsius = row.find_element(By.XPATH, ".//td[@class='title-mod changeUnitT']").text
+    description = row.find_element(By.XPATH, ".//td[@class='descripcion']/strong").text
+    wind_speed = row.find_element(By.XPATH, ".//div[@class='row wind']/span[@class='velocidad col']").text.replace('\n', ' ')
+    uv_index = row.find_element(By.XPATH, ".//span[@class='row']//span[@class='col velocidad']/strong").text
+    
+    string_result = f"Horario: {day_time} \n Temperatura: {temp_in_celsius} \n Descrição: {description} \n Variação da velocidade do vento: {wind_speed} \n Indice Uv: {uv_index}"
+    driver.quit()
 
-temperatura = row.find_element(By.XPATH, ".//td[@class='title-mod changeUnitT']").text
-print("Temperatura:", temperatura)
-
-descricao = row.find_element(By.XPATH, ".//td[@class='descripcion']/strong").text
-print("Descrição:", descricao)
-
-velocidade_vento = row.find_element(By.XPATH, ".//div[@class='row wind']/span[@class='velocidad col']").text
-print("Velocidade do Vento:", velocidade_vento)
-
-indice_uv = row.find_element(By.XPATH, ".//span[@class='row']//span[@class='col velocidad']/strong").text
-print("Índice UV:", indice_uv)
-
-driver.quit()
+    return string_result
